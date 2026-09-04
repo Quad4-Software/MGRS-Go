@@ -51,7 +51,6 @@ func TestProjForwardUTMmatchesLibrary(t *testing.T) {
 	}
 	const metreTol = 0.5
 	for _, tc := range cases {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			zone, zerr := LongitudeZone(tc.lat, tc.lon)
 			if zerr != nil {

@@ -33,8 +33,10 @@ type Parts struct {
 	Point      Point
 }
 
-const DefaultDigitPairs = 5
-const MaxEncodedLen = 5 + MaxDigitPairs*2
+const (
+	DefaultDigitPairs = 5
+	MaxEncodedLen     = 5 + MaxDigitPairs*2
+)
 
 func LongitudeZone(latDeg, lonDeg float64) (int, error) {
 	switch {
@@ -181,8 +183,7 @@ func EncodeBytes(latDeg, lonDeg float64, digitPairs int) ([]byte, error) {
 // bytes written. dst must have length >= MaxEncodedLen for arbitrary zone.
 // This allows a zero-allocation encode path when the caller reuses a fixed buffer.
 func EncodeTo(dst []byte, latDeg, lonDeg float64, digitPairs int) (int, error) {
-	switch {
-	case digitPairs < 0 || digitPairs > MaxDigitPairs:
+	if digitPairs < 0 || digitPairs > MaxDigitPairs {
 		return 0, ErrInvalidDigitPairs
 	}
 	g, err := LatLonToGrid(latDeg, lonDeg)
@@ -208,7 +209,7 @@ func AppendEncode(dst []byte, latDeg, lonDeg float64, digitPairs int) ([]byte, e
 
 // Decode converts an MGRS reference to a WGS84 point.
 func Decode(reference string, centerCell bool) (Point, error) {
-	data := compactUpperAsciiFromString(reference)
+	data := compactUpperASCIIFromString(reference)
 	if len(data) == 0 {
 		return Point{}, ErrInvalidMGRS
 	}
@@ -221,7 +222,7 @@ func Decode(reference string, centerCell bool) (Point, error) {
 
 // DecodeParts converts an MGRS reference into structured grid and geographic parts.
 func DecodeParts(reference string, centerCell bool) (Parts, error) {
-	data := compactUpperAsciiFromString(reference)
+	data := compactUpperASCIIFromString(reference)
 	if len(data) == 0 {
 		return Parts{}, ErrInvalidMGRS
 	}

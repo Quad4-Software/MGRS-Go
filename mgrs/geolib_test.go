@@ -47,7 +47,6 @@ func TestGeoLibEncodeMatchesGeoConvert(t *testing.T) {
 		{"baghdad-1km", 33.33424, 44.40363, 2},
 	}
 	for _, tc := range cases {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			out := runGeoConvert(t, path,
 				[]string{"-m", "-p", strconv.Itoa(geoConvertPrec(tc.pairs))},
@@ -74,7 +73,6 @@ func TestGeoLibDecodeCentreMatchesGeoConvert(t *testing.T) {
 		"19TDJ3858797365",
 	}
 	for _, ref := range refs {
-		ref := ref
 		t.Run(ref, func(t *testing.T) {
 			out := runGeoConvert(t, path, []string{"-g", "-p", "9"}, ref+"\n")
 			fields := strings.Fields(out)

@@ -1,6 +1,10 @@
 package mgrs
 
-import "testing"
+import (
+	"bytes"
+	"errors"
+	"testing"
+)
 
 func TestAppendEncode_NoAllocsWithSufficientCapacity(t *testing.T) {
 	const runs = 1000
@@ -40,7 +44,7 @@ func TestEncodeTo_NoAllocsWithSufficientCapacity(t *testing.T) {
 func TestEncodeTo_ShortBuffer(t *testing.T) {
 	dst := make([]byte, 2)
 	_, err := EncodeTo(dst, 52.658, 5.892, DefaultDigitPairs)
-	if err != ErrShortBuffer {
+	if !errors.Is(err, ErrShortBuffer) {
 		t.Fatalf("got %v want %v", err, ErrShortBuffer)
 	}
 }
@@ -56,8 +60,8 @@ func TestEncodeTo_EqualsEncodeBytes(t *testing.T) {
 		t.Fatal(err)
 	}
 	got := dst[:n]
-	if string(got) != string(want) {
-		t.Fatalf("got %q want %q", string(got), string(want))
+	if !bytes.Equal(got, want) {
+		t.Fatalf("got %q want %q", got, want)
 	}
 }
 

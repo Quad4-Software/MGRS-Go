@@ -140,6 +140,17 @@ go test ./mgrs -bench=. -benchmem
 | Bounded fuzz | `go test ./mgrs -fuzz=FuzzEncodeDecodeIEEE -fuzztime=5s` |
 | Bench + allocs | `go test ./mgrs -bench=. -benchmem` |
 
+## Development
+
+```bash
+make tools   # golangci-lint, gofumpt, goimports, staticcheck
+make fmt
+make lint
+make ci      # vet + lint + staticcheck + test
+```
+
+CI runs `golangci-lint`, `staticcheck`, a format check (`gofumpt` / `goimports`), then the oracle test job.
+
 ## License
 
 Copyright 2026 Quad4. See [LICENSE](LICENSE) (0BSD).

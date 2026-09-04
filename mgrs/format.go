@@ -5,7 +5,7 @@ import "strings"
 // FormatSpaced returns a spaced MGRS string (GZD square easting northing).
 // Input may be compact or already spaced. DigitPairs 0 omits numeric groups.
 func FormatSpaced(compactOrSpaced string) (string, error) {
-	data := compactUpperAsciiFromString(compactOrSpaced)
+	data := compactUpperASCIIFromString(compactOrSpaced)
 	if len(data) == 0 {
 		return "", ErrInvalidMGRS
 	}

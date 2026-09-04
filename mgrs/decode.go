@@ -1,6 +1,6 @@
 package mgrs
 
-func stringIndexAscii(s string, needle byte) int {
+func stringIndexASCII(s string, needle byte) int {
 	for i := 0; i < len(s); i++ {
 		if s[i] == needle {
 			return i
@@ -9,7 +9,7 @@ func stringIndexAscii(s string, needle byte) int {
 	return -1
 }
 
-func byteIndexAscii(chars []byte, c byte) int {
+func byteIndexASCII(chars []byte, c byte) int {
 	for i, v := range chars {
 		if v == c {
 			return i
@@ -53,7 +53,7 @@ func parseZonePrefix(buf []byte) (zone int, used int, err error) {
 	return zone, used, nil
 }
 
-func compactUpperAsciiFromString(ref string) []byte {
+func compactUpperASCIIFromString(ref string) []byte {
 	out := make([]byte, 0, len(ref))
 	for i := 0; i < len(ref); i++ {
 		ch := ref[i]
@@ -90,7 +90,7 @@ func decodeUTMNormalized(data []byte, centerCell bool) (Parts, error) {
 		return Parts{}, ErrInvalidMGRS
 	}
 
-	bandLUT := byteIndexAscii(latBand, data[idx])
+	bandLUT := byteIndexASCII(latBand, data[idx])
 	if bandLUT < 0 {
 		return Parts{}, ErrInvalidMGRS
 	}
@@ -103,14 +103,14 @@ func decodeUTMNormalized(data []byte, centerCell bool) (Parts, error) {
 	}
 
 	colLetter := data[idx]
-	col := stringIndexAscii(utmcols[(zone-1)%3], colLetter)
+	col := stringIndexASCII(utmcols[(zone-1)%3], colLetter)
 	if col < 0 {
 		return Parts{}, ErrInvalidMGRS
 	}
 	idx++
 
 	rowLetter := data[idx]
-	rowPeriodic := byteIndexAscii(utmrows, rowLetter)
+	rowPeriodic := byteIndexASCII(utmrows, rowLetter)
 	if rowPeriodic < 0 {
 		return Parts{}, ErrInvalidMGRS
 	}

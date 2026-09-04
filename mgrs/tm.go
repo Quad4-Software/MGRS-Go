@@ -11,17 +11,12 @@ func meridianRadiusSin(sinPhi float64) float64 {
 	return WGSSemiMajorAxis * (1.0 - wgsE2) / math.Pow(1.0-wgsE2*ss, 1.5)
 }
 
-func meridianRadius(phi float64) float64 {
-	sinPhi := math.Sin(phi)
-	return meridianRadiusSin(sinPhi)
-}
-
-func footpointLatitudeFromMeridionalDistance(M float64) float64 {
-	phi := M / WGSSemiMajorAxis
+func footpointLatitudeFromMeridionalDistance(m float64) float64 {
+	phi := m / WGSSemiMajorAxis
 	const epsFoot = 1e-14
-	for i := 0; i < 16; i++ {
+	for range 16 {
 		sinPhi := math.Sin(phi)
-		f := wgsM(phi) - M
+		f := wgsM(phi) - m
 		if math.Abs(f) < epsFoot {
 			break
 		}
@@ -150,7 +145,3 @@ func inverseTM(e, n float64, zone int, south bool) (latDeg, lonDeg float64) {
 	latDeg = phi * radDeg
 	return latDeg, lonDeg
 }
-
-func tmUTMFalsEasting() float64 { return utmFalseEastM }
-
-func tmUTMNorthingSouthern() float64 { return utmSouthernFalseNorthM }

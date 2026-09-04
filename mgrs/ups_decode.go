@@ -4,7 +4,7 @@ func decodeUPSNormalized(data []byte, centerCell bool) (Parts, error) {
 	if len(data) < 1 {
 		return Parts{}, ErrInvalidMGRS
 	}
-	iband := byteIndexAscii(upsband, data[0])
+	iband := byteIndexASCII(upsband, data[0])
 	if iband < 0 {
 		return Parts{}, ErrInvalidMGRS
 	}
@@ -20,8 +20,8 @@ func decodeUPSNormalized(data []byte, centerCell bool) (Parts, error) {
 	if northp {
 		rowLetters = upsrows[1]
 	}
-	icol := stringIndexAscii(colLetters, data[1])
-	irow := stringIndexAscii(rowLetters, data[2])
+	icol := stringIndexASCII(colLetters, data[1])
+	irow := stringIndexASCII(rowLetters, data[2])
 	if icol < 0 || irow < 0 {
 		return Parts{}, ErrInvalidMGRS
 	}

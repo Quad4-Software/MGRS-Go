@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func fuzzSanitizeAscii(b []byte) []byte {
+func fuzzSanitizeASCII(b []byte) []byte {
 	const maxChars = 80
 	if len(b) > maxChars {
 		b = b[:maxChars]
@@ -23,14 +23,14 @@ func fuzzSanitizeAscii(b []byte) []byte {
 	return dst
 }
 
-func FuzzDecodeRandomAsciiNoPanic(f *testing.F) {
+func FuzzDecodeRandomASCIINoPanic(f *testing.F) {
 	f.Add([]byte("19TDJ3858897366"))
 	f.Add([]byte(`03u xd 98281 74621`))
 	f.Add([]byte("BAN0000000000"))
 	f.Add([]byte("Z AB 96454 52981"))
 	f.Add([]byte("garbage-string"))
-	f.Fuzz(func(t *testing.T, payload []byte) {
-		buf := bytes.ToUpper(fuzzSanitizeAscii(payload))
+	f.Fuzz(func(_ *testing.T, payload []byte) {
+		buf := bytes.ToUpper(fuzzSanitizeASCII(payload))
 		_, _ = Decode(string(bytes.TrimSpace(buf)), false)
 		_, _ = DecodeParts(string(bytes.TrimSpace(buf)), true)
 	})

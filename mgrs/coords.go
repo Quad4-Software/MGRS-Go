@@ -25,15 +25,14 @@ func checkCoords(utm bool, north *bool, x, y *float64) error {
 		ind++
 	}
 
-	if !(ix >= minEastingIdx[ind] && ix < maxEastingIdx[ind]) {
+	if ix < minEastingIdx[ind] || ix >= maxEastingIdx[ind] {
 		if ix == maxEastingIdx[ind] && *x == float64(maxEastingIdx[ind])*mgrsTileSize {
 			*x -= coordBoundaryEps
-			ix = int(math.Floor(*x / mgrsTileSize))
 		} else {
 			return ErrInvalidGrid
 		}
 	}
-	if !(iy >= minNorthingIdx[ind] && iy < maxNorthingIdx[ind]) {
+	if iy < minNorthingIdx[ind] || iy >= maxNorthingIdx[ind] {
 		if iy == maxNorthingIdx[ind] && *y == float64(maxNorthingIdx[ind])*mgrsTileSize {
 			*y -= coordBoundaryEps
 			iy = int(math.Floor(*y / mgrsTileSize))

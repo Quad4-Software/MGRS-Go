@@ -30,7 +30,7 @@ func utmRow(iband, icol, rowPeriodic int) int {
 	baseRow := (minRow+maxRow)/2 - utmerowPeriod/2
 
 	i := posMod(rowPeriodic-baseRow+maxUTMsRowTiles, utmerowPeriod) + baseRow
-	if !(i >= minRow && i <= maxRow) {
+	if i < minRow || i > maxRow {
 		sBand := iband
 		if iband < 0 {
 			sBand = -iband - 1

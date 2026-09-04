@@ -19,11 +19,12 @@ func encodeUPSInto(dst []byte, north bool, easting, northing float64, digitPairs
 		rowLetters = upsrows[1]
 	}
 	var colBase int
-	if eastp {
+	switch {
+	case eastp:
 		colBase = upsEasting
-	} else if north {
+	case north:
 		colBase = minUPSNind
-	} else {
+	default:
 		colBase = minUPSSind
 	}
 	rowBase := minUPSSind

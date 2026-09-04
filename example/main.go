@@ -90,7 +90,7 @@ func main() {
 	}
 	var benchBuf [mgrs.MaxEncodedLen]byte
 	const warmup = 1_000
-	for i := 0; i < warmup; i++ {
+	for range warmup {
 		if _, err := mgrs.EncodeTo(benchBuf[:], lat, lon, *pairs); err != nil {
 			die(err)
 		}

@@ -54,7 +54,6 @@ func TestProjForwardUPSmatchesLibrary(t *testing.T) {
 	}
 	const metreTol = 1.0
 	for _, tc := range cases {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			eMine, nMine := forwardUPS(tc.lat, tc.lon, tc.north)
 			eProj, nProj := runCS2CSUPS(t, tc.lon, tc.lat, tc.north)

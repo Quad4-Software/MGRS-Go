@@ -11,7 +11,7 @@ func TestLeakEncodeDecodeBurstSteady(t *testing.T) {
 	runtime.GC()
 	before := runtime.NumGoroutine()
 	const n = 2000
-	for i := 0; i < n; i++ {
+	for range n {
 		s, err := Encode(lat, lon, DefaultDigitPairs)
 		if err != nil {
 			t.Fatal(err)

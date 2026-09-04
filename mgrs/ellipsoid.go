@@ -15,11 +15,6 @@ var (
 	tmUTMScaleK0 = 0.9996
 )
 
-func wgsN(phi float64) float64 {
-	sinPhi := math.Sin(phi)
-	return wgsNFromSin(sinPhi)
-}
-
 func wgsNFromSin(sinPhi float64) float64 {
 	return WGSSemiMajorAxis / math.Sqrt(1.0-wgsE2*sinPhi*sinPhi)
 }

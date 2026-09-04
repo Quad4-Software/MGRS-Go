@@ -38,7 +38,11 @@ func TestGoldenCorpus(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer f.Close()
+	t.Cleanup(func() {
+		if cerr := f.Close(); cerr != nil {
+			t.Errorf("close golden corpus: %v", cerr)
+		}
+	})
 
 	sc := bufio.NewScanner(f)
 	lineNo := 0

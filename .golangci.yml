@@ -1,0 +1,102 @@
+# golangci-lint v2 configuration for MGRS-Go.
+version: "2"
+
+run:
+  timeout: 5m
+  tests: true
+
+linters:
+  default: standard
+  enable:
+    - asciicheck
+    - bidichk
+    - copyloopvar
+    - durationcheck
+    - errorlint
+    - forcetypeassert
+    - gocheckcompilerdirectives
+    - gocritic
+    - godot
+    - goprintffuncname
+    - gosec
+    - misspell
+    - modernize
+    - nakedret
+    - nilerr
+    - prealloc
+    - predeclared
+    - reassign
+    - revive
+    - unconvert
+    - unparam
+    - usetesting
+  settings:
+    errcheck:
+      check-type-assertions: true
+    gocritic:
+      enabled-tags:
+        - diagnostic
+        - performance
+    gosec:
+      excludes:
+        - G115
+    misspell:
+      locale: US
+      ignore-rules:
+        - metre
+        - metres
+        - centre
+    revive:
+      rules:
+        - name: blank-imports
+        - name: context-as-argument
+        - name: context-keys-type
+        - name: dot-imports
+        - name: error-return
+        - name: error-strings
+        - name: error-naming
+        - name: exported
+        - name: increment-decrement
+        - name: indent-error-flow
+        - name: package-comments
+        - name: range
+        - name: receiver-naming
+        - name: time-naming
+        - name: unexported-return
+        - name: unused-parameter
+        - name: var-declaration
+        - name: var-naming
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    rules:
+      - path: mgrs/grid\.go
+        text: "posMod"
+        linters:
+          - unparam
+      - path: _test\.go
+        linters:
+          - gosec
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+
+formatters:
+  enable:
+    - gofumpt
+    - goimports
+  settings:
+    gofumpt:
+      module-path: github.com/Quad4-Software/MGRS-Go
+    goimports:
+      local-prefixes:
+        - github.com/Quad4-Software/MGRS-Go
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0

@@ -63,7 +63,7 @@ func inverseUPS(easting, northing float64, north bool) (latDeg, lonDeg float64) 
 	t := rho * c / (2 * upsScaleK0 * WGSSemiMajorAxis)
 	e := math.Sqrt(wgsE2)
 	latRad := math.Pi/2 - 2*math.Atan(t)
-	for i := 0; i < 10; i++ {
+	for range 10 {
 		sinLat := math.Sin(latRad)
 		latRad = math.Pi/2 - 2*math.Atan(t*math.Pow((1-e*sinLat)/(1+e*sinLat), e/2))
 	}

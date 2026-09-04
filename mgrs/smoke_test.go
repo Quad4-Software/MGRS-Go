@@ -38,29 +38,21 @@ func TestSmokeExportedAPIWarmPath(t *testing.T) {
 }
 
 func TestSmokeSouthernRoundTrip(t *testing.T) {
-
 	lat := -37.814
 	lon := 144.963
 	s, err := Encode(lat, lon, DefaultDigitPairs)
 	if err != nil {
-
 		t.Fatal(err)
-
 	}
 	pt, err := Decode(s, false)
 	if err != nil {
-
 		t.Fatal(err)
-
 	}
 	clat := math.Max(math.Abs(math.Cos(lat*degRad)), 1e-3)
 	maxLat := 2e-3
 	maxLon := maxLat / clat
 
 	if math.Abs(pt.Lat-lat) > maxLat || math.Abs(pt.Lon-lon) > maxLon {
-
 		t.Fatalf("decoded drift %+v versus input lat=%v lon=%v via %s", pt, lat, lon, s)
-
 	}
-
 }

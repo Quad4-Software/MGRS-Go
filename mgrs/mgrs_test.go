@@ -56,7 +56,6 @@ func TestEncodeRoundTripPublicationPoint(t *testing.T) {
 	lonTol := latTol / math.Cos(latLit*degRad)
 
 	if math.Abs(pt.Lat-latLit) > latTol || math.Abs(pt.Lon-lonLit) > lonTol {
-
 		t.Fatalf(
 			"round trip error too wide for publication point:\n"+
 				"want lat/lon %.9f %.9f\n"+
@@ -73,7 +72,6 @@ func TestEncodeRoundTripPublicationPoint(t *testing.T) {
 }
 
 func TestRoundTripRegionalSamples(t *testing.T) {
-
 	points := []struct {
 		name string
 
@@ -93,9 +91,7 @@ func TestRoundTripRegionalSamples(t *testing.T) {
 	}
 
 	for _, row := range points {
-		row := row
 		t.Run(row.name, func(t *testing.T) {
-
 			latTol := 4 * (1.0 / 111_111.0)
 
 			cosClamp := math.Max(math.Abs(math.Cos(row.lat*degRad)), 1e-3)
@@ -124,13 +120,11 @@ func TestRoundTripRegionalSamples(t *testing.T) {
 					s,
 				)
 			}
-
 		})
 	}
 }
 
 func TestLongitudeZoneOverrides(t *testing.T) {
-
 	rows := []struct {
 		name string
 
@@ -142,7 +136,6 @@ func TestLongitudeZoneOverrides(t *testing.T) {
 
 		wantErr bool
 	}{
-
 		{"standard-zone", 0, 10, 32, false},
 
 		{"norway-expanded", 60, 4, 32, false},
@@ -153,17 +146,13 @@ func TestLongitudeZoneOverrides(t *testing.T) {
 	}
 
 	for _, row := range rows {
-		row := row
 		t.Run(row.name, func(t *testing.T) {
-
 			got, err := LongitudeZone(row.lat, row.lon)
 
 			if row.wantErr {
 
 				if err == nil {
-
 					t.Fatal("expected error")
-
 				}
 
 				return
@@ -171,19 +160,12 @@ func TestLongitudeZoneOverrides(t *testing.T) {
 			}
 
 			if err != nil {
-
 				t.Fatal(err)
-
 			}
 
 			if got != row.want {
-
 				t.Fatalf("zone got %d want %d", got, row.want)
-
 			}
-
 		})
-
 	}
-
 }
