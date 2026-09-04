@@ -7,6 +7,9 @@ GOIMPORTS ?= $(GOBIN)/goimports
 STATICCHECK ?= $(GOBIN)/staticcheck
 
 GOLANGCI_LINT_VERSION ?= v2.13.2
+STATICCHECK_VERSION ?= v0.8.1
+GOFUMPT_VERSION ?= v0.11.0
+GOIMPORTS_VERSION ?= v0.49.0
 
 .PHONY: help tools fmt vet lint staticcheck test test-race oracle bench fuzz ci clean
 
@@ -32,13 +35,13 @@ $(GOLANGCI_LINT):
 	$(GO) install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@$(GOLANGCI_LINT_VERSION)
 
 $(GOFUMPT):
-	$(GO) install mvdan.cc/gofumpt@latest
+	$(GO) install mvdan.cc/gofumpt@$(GOFUMPT_VERSION)
 
 $(GOIMPORTS):
-	$(GO) install golang.org/x/tools/cmd/goimports@latest
+	$(GO) install golang.org/x/tools/cmd/goimports@$(GOIMPORTS_VERSION)
 
 $(STATICCHECK):
-	$(GO) install honnef.co/go/tools/cmd/staticcheck@latest
+	$(GO) install honnef.co/go/tools/cmd/staticcheck@$(STATICCHECK_VERSION)
 
 fmt: $(GOFUMPT) $(GOIMPORTS)
 	$(GOFUMPT) -l -w .

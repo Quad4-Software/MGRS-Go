@@ -16,6 +16,11 @@ updates:
       interval: weekly
       day: monday
     open-pull-requests-limit: 5
+    # Prefer SHA-pinned updates. Review action PRs carefully after tj-actions-style incidents.
     labels:
       - dependencies
       - github-actions
+    groups:
+      github-actions:
+        patterns:
+          - "*"

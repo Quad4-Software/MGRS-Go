@@ -37,6 +37,10 @@ permissions:
 
 env:
   MGRS_REQUIRE_ORACLES: "1"
+  # Pin Go toolchain installs. Avoid @latest in CI after supply-chain tag retargeting attacks.
+  STATICCHECK_VERSION: v0.8.1
+  GOFUMPT_VERSION: v0.11.0
+  GOIMPORTS_VERSION: v0.49.0
 
 jobs:
   lint:
@@ -44,8 +48,15 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
+      - name: Harden runner
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Set up Go
         uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
@@ -62,14 +73,14 @@ jobs:
       - name: staticcheck
         run: |
           set -euo pipefail
-          go install honnef.co/go/tools/cmd/staticcheck@latest
+          go install honnef.co/go/tools/cmd/staticcheck@${STATICCHECK_VERSION}
           staticcheck ./...
 
       - name: Format check
         run: |
           set -euo pipefail
-          go install mvdan.cc/gofumpt@latest
-          go install golang.org/x/tools/cmd/goimports@latest
+          go install mvdan.cc/gofumpt@${GOFUMPT_VERSION}
+          go install golang.org/x/tools/cmd/goimports@${GOIMPORTS_VERSION}
           gofumpt -l .
           test -z "$(gofumpt -l .)"
           test -z "$(goimports -local github.com/Quad4-Software/MGRS-Go -l .)"
@@ -84,8 +95,15 @@ jobs:
         go:
           - "1.26.5"
     steps:
+      - name: Harden runner
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Install PROJ and GeographicLib
         run: |
