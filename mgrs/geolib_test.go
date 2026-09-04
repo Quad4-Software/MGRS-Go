@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 	"os/exec"
+	"strconv"
 	"strings"
 	"testing"
 )
@@ -13,6 +14,19 @@ import (
 // GeographicLib uses digits_per_coord = 5 + prec for MGRS.
 func geoConvertPrec(digitPairs int) int {
 	return digitPairs - 5
+}
+
+func runGeoConvert(t *testing.T, path string, args []string, stdin string) string {
+	t.Helper()
+	cmd := exec.Command(path, args...)
+	cmd.Stdin = strings.NewReader(stdin)
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+	if err := cmd.Run(); err != nil {
+		t.Fatalf("GeoConvert %v: %v\nstdout=%q\nstderr=%q", args, err, stdout.String(), stderr.String())
+	}
+	return strings.TrimSpace(stdout.String())
 }
 
 func TestGeoLibEncodeMatchesGeoConvert(t *testing.T) {
@@ -35,15 +49,11 @@ func TestGeoLibEncodeMatchesGeoConvert(t *testing.T) {
 	for _, tc := range cases {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			var in bytes.Buffer
-			fmt.Fprintf(&in, "%.12f %.12f\n", tc.lat, tc.lon)
-			cmd := exec.Command(path, "-m", fmt.Sprintf("-p%d", geoConvertPrec(tc.pairs)))
-			cmd.Stdin = &in
-			out, err := cmd.Output()
-			if err != nil {
-				t.Fatalf("GeoConvert: %v", err)
-			}
-			want := strings.ReplaceAll(strings.TrimSpace(string(out)), " ", "")
+			out := runGeoConvert(t, path,
+				[]string{"-m", "-p", strconv.Itoa(geoConvertPrec(tc.pairs))},
+				fmt.Sprintf("%.12f %.12f\n", tc.lat, tc.lon),
+			)
+			want := strings.ReplaceAll(out, " ", "")
 			got, err := Encode(tc.lat, tc.lon, tc.pairs)
 			if err != nil {
 				t.Fatal(err)
@@ -66,13 +76,8 @@ func TestGeoLibDecodeCentreMatchesGeoConvert(t *testing.T) {
 	for _, ref := range refs {
 		ref := ref
 		t.Run(ref, func(t *testing.T) {
-			cmd := exec.Command(path, "-g", "-p", "9")
-			cmd.Stdin = strings.NewReader(ref + "\n")
-			out, err := cmd.Output()
-			if err != nil {
-				t.Fatalf("GeoConvert decode: %v out=%s", err, out)
-			}
-			fields := strings.Fields(string(out))
+			out := runGeoConvert(t, path, []string{"-g", "-p", "9"}, ref+"\n")
+			fields := strings.Fields(out)
 			if len(fields) < 2 {
 				t.Fatalf("unexpected GeoConvert output %q", out)
 			}
