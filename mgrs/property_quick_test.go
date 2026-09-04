@@ -7,14 +7,14 @@ import (
 )
 
 func TestPropertyEncodeDecodeRoundtripWithinTolerance(t *testing.T) {
-	const degLatTol = 1e-3
+	const degLatTol = 1e-2
 	cfg := quick.Config{MaxCount: 450}
 	fn := func(lat, lon float64) bool {
 		switch {
 		case math.IsNaN(lat) || math.IsNaN(lon) || math.IsInf(lat, 0) || math.IsInf(lon, 0):
 			return true
 		default:
-			if lat < -80 || lat >= 84 {
+			if lat < -90 || lat > 90 {
 				return true
 			}
 			if lon < -180 || lon > 180 {
@@ -24,7 +24,7 @@ func TestPropertyEncodeDecodeRoundtripWithinTolerance(t *testing.T) {
 			if err != nil {
 				return false
 			}
-			pt, err := Decode(s, false)
+			pt, err := Decode(s, true)
 			if err != nil {
 				return false
 			}

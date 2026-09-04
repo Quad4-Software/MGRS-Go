@@ -1,0 +1,64 @@
+# Fast Go CI: test, race, vet, and short bench smoke.
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+      - main
+    paths:
+      - "**.go"
+      - "go.mod"
+      - "go.sum"
+      - "mgrs/testdata/**"
+      - ".github/workflows/ci.yml"
+  pull_request:
+    branches:
+      - master
+      - main
+    paths:
+      - "**.go"
+      - "go.mod"
+      - "go.sum"
+      - "mgrs/testdata/**"
+      - ".github/workflows/ci.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: test (go ${{ matrix.go }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        go:
+          - "1.26.5"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Test
+        run: go test ./... -count=1
+
+      - name: Race
+        run: go test ./... -race -count=1
+
+      - name: Bench smoke
+        run: go test ./mgrs -bench=BenchmarkEncodeTo_preallocated -benchmem -count=1 -benchtime=100ms

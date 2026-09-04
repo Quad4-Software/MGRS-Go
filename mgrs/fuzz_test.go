@@ -26,19 +26,22 @@ func fuzzSanitizeAscii(b []byte) []byte {
 func FuzzDecodeRandomAsciiNoPanic(f *testing.F) {
 	f.Add([]byte("19TDJ3858897366"))
 	f.Add([]byte(`03u xd 98281 74621`))
+	f.Add([]byte("BAN0000000000"))
+	f.Add([]byte("Z AB 96454 52981"))
 	f.Add([]byte("garbage-string"))
 	f.Fuzz(func(t *testing.T, payload []byte) {
 		buf := bytes.ToUpper(fuzzSanitizeAscii(payload))
 		_, _ = Decode(string(bytes.TrimSpace(buf)), false)
+		_, _ = DecodeParts(string(bytes.TrimSpace(buf)), true)
 	})
 }
 
 func clampLatForFuzz(lat float64) float64 {
 	switch {
-	case lat < -79.999:
-		lat = -79.999
-	case lat > 83.999:
-		lat = 83.999
+	case lat < -90:
+		lat = -90
+	case lat > 90:
+		lat = 90
 	default:
 	}
 	return lat
@@ -58,6 +61,9 @@ func FuzzEncodeDecodeIEEE(f *testing.F) {
 		{math.Float64bits(-33.9243), math.Float64bits(18.4241)},
 		{math.Float64bits(71.1699), math.Float64bits(25.7836)},
 		{math.Float64bits(0), math.Float64bits(174.764)},
+		{math.Float64bits(85), math.Float64bits(10)},
+		{math.Float64bits(-87), math.Float64bits(120)},
+		{math.Float64bits(-89.5), math.Float64bits(45)},
 	}
 	for _, s := range seeds {
 		f.Add(s[0], s[1])
@@ -78,7 +84,7 @@ func FuzzEncodeDecodeIEEE(f *testing.F) {
 		if encErr != nil {
 			t.Fatalf("unexpected encode failure lat=%g lon=%g err=%v", lat, lon, encErr)
 		}
-		pt, decErr := Decode(s, false)
+		pt, decErr := Decode(s, true)
 		if decErr != nil {
 			t.Fatal(decErr)
 		}

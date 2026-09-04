@@ -17,13 +17,27 @@ func TestUnitEncode_digitPairsBoundary(t *testing.T) {
 }
 
 func TestUnitEncode_latitudeBelt(t *testing.T) {
-	_, err := Encode(-82, 40, DefaultDigitPairs)
+	_, err := LongitudeZone(-82, 40)
 	if !errors.Is(err, ErrLatOutOfUTMRange) {
-		t.Fatalf("got %v", err)
+		t.Fatalf("LongitudeZone south polar: got %v", err)
 	}
-	_, err = Encode(85, 0, DefaultDigitPairs)
+	_, err = LongitudeZone(85, 0)
 	if !errors.Is(err, ErrLatOutOfUTMRange) {
-		t.Fatalf("got %v", err)
+		t.Fatalf("LongitudeZone north polar: got %v", err)
+	}
+	s, err := Encode(-82, 40, DefaultDigitPairs)
+	if err != nil {
+		t.Fatalf("Encode south UPS: %v", err)
+	}
+	if s[0] != 'A' && s[0] != 'B' {
+		t.Fatalf("south UPS GZD want A/B got %q", s)
+	}
+	s, err = Encode(85, 0, DefaultDigitPairs)
+	if err != nil {
+		t.Fatalf("Encode north UPS: %v", err)
+	}
+	if s[0] != 'Y' && s[0] != 'Z' {
+		t.Fatalf("north UPS GZD want Y/Z got %q", s)
 	}
 }
 

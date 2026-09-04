@@ -70,36 +70,49 @@ func compactUpperAsciiFromString(ref string) []byte {
 	return out
 }
 
-func decodeNormalizedUpper(data []byte, centerCell bool) (Point, error) {
+func decodeNormalizedParts(data []byte, centerCell bool) (Parts, error) {
+	if len(data) == 0 {
+		return Parts{}, ErrInvalidMGRS
+	}
+	if data[0] >= '0' && data[0] <= '9' {
+		return decodeUTMNormalized(data, centerCell)
+	}
+	return decodeUPSNormalized(data, centerCell)
+}
+
+func decodeUTMNormalized(data []byte, centerCell bool) (Parts, error) {
 	zone, used, err := parseZonePrefix(data)
 	if err != nil {
-		return Point{}, err
+		return Parts{}, err
 	}
 	idx := used
 	if idx >= len(data) {
-		return Point{}, ErrInvalidMGRS
+		return Parts{}, ErrInvalidMGRS
 	}
 
 	bandLUT := byteIndexAscii(latBand, data[idx])
 	if bandLUT < 0 {
-		return Point{}, ErrInvalidMGRS
+		return Parts{}, ErrInvalidMGRS
 	}
+	band := data[idx]
 	idx++
 	northp := bandLUT >= 10
 
 	if idx+2 > len(data) {
-		return Point{}, ErrInvalidMGRS
+		return Parts{}, ErrInvalidMGRS
 	}
 
-	col := stringIndexAscii(utmcols[(zone-1)%3], data[idx])
+	colLetter := data[idx]
+	col := stringIndexAscii(utmcols[(zone-1)%3], colLetter)
 	if col < 0 {
-		return Point{}, ErrInvalidMGRS
+		return Parts{}, ErrInvalidMGRS
 	}
 	idx++
 
-	rowPeriodic := byteIndexAscii(utmrows, data[idx])
+	rowLetter := data[idx]
+	rowPeriodic := byteIndexAscii(utmrows, rowLetter)
 	if rowPeriodic < 0 {
-		return Point{}, ErrInvalidMGRS
+		return Parts{}, ErrInvalidMGRS
 	}
 	idx++
 
@@ -111,58 +124,28 @@ func decodeNormalizedUpper(data []byte, centerCell bool) (Point, error) {
 	iBand := bandLUT - 10
 	rowTiles := utmRow(iBand, col, iRow)
 	if rowTiles == maxUTMsRowTiles {
-		return Point{}, ErrInvalidGridSquareBand
+		return Parts{}, ErrInvalidGridSquareBand
 	}
 	if !northp {
 		rowTiles += 100
 	}
 
 	e100k := col + minUTMCols
-
 	tail := data[idx:]
-	if len(tail)%2 != 0 {
-		return Point{}, ErrInvalidMGRS
+	easting, northing, pairs, err := metresFromDigitTail(tail, e100k, rowTiles, centerCell)
+	if err != nil {
+		return Parts{}, err
 	}
-	pairs := len(tail) / 2
-	if pairs > MaxDigitPairs {
-		return Point{}, ErrInvalidMGRS
-	}
-
-	for _, ch := range tail {
-		if ch < '0' || ch > '9' {
-			return Point{}, ErrInvalidMGRS
-		}
-	}
-
-	scale := float64(1)
-
-	xQty := float64(e100k)
-	yQty := float64(rowTiles)
-
-	eastDigits := tail[:pairs]
-	northDigits := tail[pairs:]
-
-	for i := 0; i < pairs; i++ {
-		ed, okE := parseDigit(eastDigits[i])
-		nd, okN := parseDigit(northDigits[i])
-		if !okE || !okN {
-			return Point{}, ErrInvalidMGRS
-		}
-		scale *= float64(mgrsdigitBase)
-		xQty = float64(mgrsdigitBase)*xQty + float64(ed)
-		yQty = float64(mgrsdigitBase)*yQty + float64(nd)
-	}
-
-	if centerCell {
-		scale *= 2
-		xQty = 2*xQty + 1
-		yQty = 2*yQty + 1
-	}
-
-	easting := mgrsTileSize * xQty / scale
-	northing := mgrsTileSize * yQty / scale
-
 	latDeg, lonDeg := inverseTM(easting, northing, zone, !northp)
-
-	return Point{Lat: latDeg, Lon: lonDeg}, nil
+	return Parts{
+		Zone:       zone,
+		North:      northp,
+		Band:       band,
+		Col:        colLetter,
+		Row:        rowLetter,
+		DigitPairs: pairs,
+		Easting:    easting,
+		Northing:   northing,
+		Point:      Point{Lat: latDeg, Lon: lonDeg},
+	}, nil
 }

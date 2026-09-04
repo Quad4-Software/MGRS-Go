@@ -8,12 +8,13 @@ import (
 	"strconv"
 	"time"
 
-	"git.quad4.io/Go-Libs/MGRS-Go/mgrs"
+	"github.com/Quad4-Software/MGRS-Go/mgrs"
 )
 
 func main() {
-	decodeFlag := flag.String("decode", "", "decode this MGRS string (southwest corner of cell)")
+	decodeFlag := flag.String("decode", "", "decode this MGRS string")
 	centerFlag := flag.Bool("center", false, "with -decode: return centre of truncated cell instead of SW corner")
+	prettyFlag := flag.Bool("pretty", false, "print spaced MGRS for encode/decode results")
 	benchIterations := flag.Uint64("bench", 0, "after other actions run this many EncodeTo iterations and print throughput (0 = skip)")
 	latStr := flag.String("lat", "52.658", "latitude decimal degrees north (negative = south)")
 	lonStr := flag.String("lon", "5.892", "longitude decimal degrees east")
@@ -30,11 +31,20 @@ func main() {
 	}
 
 	if dec := *decodeFlag; dec != "" {
-		pt, err := mgrs.Decode(dec, *centerFlag)
+		parts, err := mgrs.DecodeParts(dec, *centerFlag)
 		if err != nil {
 			die(err)
 		}
-		fmt.Printf("%s %+v lat=%f lon=%f\n", dec, pt, pt.Lat, pt.Lon)
+		fmt.Printf("%s zone=%d north=%v band=%c square=%c%c pairs=%d E=%.3f N=%.3f lat=%f lon=%f\n",
+			parts.Compact, parts.Zone, parts.North, parts.Band, parts.Col, parts.Row,
+			parts.DigitPairs, parts.Easting, parts.Northing, parts.Point.Lat, parts.Point.Lon)
+		if *prettyFlag {
+			pretty, err := mgrs.FormatSpaced(dec)
+			if err != nil {
+				die(err)
+			}
+			fmt.Printf("pretty %s\n", pretty)
+		}
 	}
 
 	lat, err := strconv.ParseFloat(*latStr, 64)
@@ -51,6 +61,19 @@ func main() {
 		die(err)
 	}
 	fmt.Printf("encode %+f %+f pairs=%d -> %s\n", lat, lon, *pairs, ref)
+	if *prettyFlag {
+		pretty, err := mgrs.FormatSpaced(ref)
+		if err != nil {
+			die(err)
+		}
+		fmt.Printf("pretty %s\n", pretty)
+	}
+
+	g, err := mgrs.LatLonToGrid(lat, lon)
+	if err != nil {
+		die(err)
+	}
+	fmt.Printf("grid zone=%d north=%v E=%.3f N=%.3f\n", g.Zone, g.North, g.Easting, g.Northing)
 
 	raw, err := mgrs.EncodeBytes(lat, lon, *pairs)
 	if err != nil {

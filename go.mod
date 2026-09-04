@@ -1,3 +1,3 @@
-module git.quad4.io/Go-Libs/MGRS-Go
+module github.com/Quad4-Software/MGRS-Go
 
-go 1.26
+go 1.26.5

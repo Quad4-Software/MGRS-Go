@@ -1,0 +1,39 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+mgrs.test
+example/example
+/example/example
+
+# Coverage / profiles
+*.out
+*.prof
+coverage.*
+cover.out
+cpu.out
+mem.out
+
+# Go workspace local
+go.work
+go.work.sum
+
+# IDE / editor
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build / tmp
+/bin/
+/dist/
+/tmp/
+*.wasm

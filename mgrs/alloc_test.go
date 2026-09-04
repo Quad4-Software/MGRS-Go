@@ -60,3 +60,51 @@ func TestEncodeTo_EqualsEncodeBytes(t *testing.T) {
 		t.Fatalf("got %q want %q", string(got), string(want))
 	}
 }
+
+func TestEncodeGridTo_NoAllocsUTMAndUPS(t *testing.T) {
+	const runs = 1000
+	var dst [MaxEncodedLen]byte
+	gUTM := Grid{Zone: 31, North: true, Easting: 595591.0, Northing: 5838152.0}
+	allocs := testing.AllocsPerRun(runs, func() {
+		n, err := EncodeGridTo(dst[:], gUTM, DefaultDigitPairs)
+		if err != nil {
+			panic(err)
+		}
+		if n <= 0 {
+			panic("empty")
+		}
+	})
+	if allocs != 0 {
+		t.Fatalf("utm EncodeGridTo allocs %.3f", allocs)
+	}
+
+	gUPS, err := LatLonToGrid(85, 10)
+	if err != nil {
+		t.Fatal(err)
+	}
+	allocs = testing.AllocsPerRun(runs, func() {
+		n, err := EncodeGridTo(dst[:], gUPS, DefaultDigitPairs)
+		if err != nil {
+			panic(err)
+		}
+		if n <= 0 {
+			panic("empty")
+		}
+	})
+	if allocs != 0 {
+		t.Fatalf("ups EncodeGridTo allocs %.3f", allocs)
+	}
+
+	allocs = testing.AllocsPerRun(runs, func() {
+		n, err := EncodeTo(dst[:], 85, 10, DefaultDigitPairs)
+		if err != nil {
+			panic(err)
+		}
+		if n <= 0 {
+			panic("empty")
+		}
+	})
+	if allocs != 0 {
+		t.Fatalf("polar EncodeTo allocs %.3f", allocs)
+	}
+}

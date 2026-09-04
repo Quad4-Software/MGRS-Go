@@ -1,22 +1,19 @@
 // Package mgrs converts between WGS84 geographic coordinates and the Military
-// Grid Reference System (MGRS) used with UTM. It follows the letter-grid rules
-// described in NGA references on UTM/MGRS (e.g. TM8358.1, Universal Grids and
-// Grid Reference Systems).
+// Grid Reference System (MGRS) over UTM and polar UPS.
 //
-// Coverage is latitudes [-80°, 84°) using UTM (the standard MGRS UTM belt).
-// Latitudes outside that range normally use UPS polar grid references, which
-// are not handled here.
+// It follows the letter-grid rules described in NGA references on UTM/MGRS
+// (e.g. TM8358.1, Universal Grids and Grid Reference Systems) and matches
+// GeographicLib / MSP GEOTRANS conventions for Norway/Svalbard zone widening,
+// UPS lettering, and upper-bound ~nanometre coordinate nudges.
 //
-// Accuracy and verification:
-// Transverse Mercator uses WGS84 with constant-folded fictitious eastings and
-// Sincos-based derivatives where possible; Norway/Svalbard zone logic matches the
-// usual GeographicLib / MSP GEOTRANS conventions. Encode path uses compact
-// fixed-capacity ASCII output plus a digit-scale lookup instead of naive pow loops.
+// Coverage is the full globe: UTM for latitudes in [-80°, 84°) and UPS outside
+// that belt (bands A/B south, Y/Z north). ZoneUPS (0) identifies polar grid
+// metres in the Grid API.
 //
-// EncodeBytes and AppendEncode avoid the Unicode string allocation of Encode when
-// you only need ASCII bytes or are batching coordinates. EncodeTo can write into
-// a caller-owned fixed buffer for a zero-allocation encode path.
+// EncodeBytes, AppendEncode, EncodeTo, and EncodeGridTo support allocation-
+// conscious callers. DecodeParts returns structured zone, band, square,
+// precision, metres, and lat/lon. FormatSpaced pretty-prints compact refs.
 //
-// Tests compare metre outputs against the PROJ `proj` binary when installed
-// (mgrs.proj_test.go) and include fuzzing plus property checks.
+// Tests include a checked-in golden corpus, optional PROJ/cs2cs metre checks,
+// optional GeographicLib GeoConvert string checks, fuzzing, and property tests.
 package mgrs
