@@ -37,10 +37,7 @@ func runProjUTM(t *testing.T, projPath string, lon, lat float64, zone int, south
 }
 
 func TestProjForwardUTMmatchesLibrary(t *testing.T) {
-	projPath, err := exec.LookPath("proj")
-	if err != nil {
-		t.Skip("PROJ cli not on PATH")
-	}
+	projPath := requireTool(t, "proj")
 	cases := []struct {
 		name     string
 		lat, lon float64
@@ -49,6 +46,8 @@ func TestProjForwardUTMmatchesLibrary(t *testing.T) {
 		{"sydney", -33.8688, 151.2093},
 		{"chile", -33.4489, -70.6693},
 		{"maine-near-publication", 44.22693333333333, -69.76947527777778},
+		{"norway-override", 60, 4},
+		{"svalbard-override", 75, 12},
 	}
 	const metreTol = 0.5
 	for _, tc := range cases {

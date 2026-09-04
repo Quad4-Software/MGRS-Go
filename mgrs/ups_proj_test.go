@@ -41,9 +41,7 @@ func runCS2CSUPS(t *testing.T, lon, lat float64, north bool) (e, n float64) {
 }
 
 func TestProjForwardUPSmatchesLibrary(t *testing.T) {
-	if _, err := exec.LookPath("cs2cs"); err != nil {
-		t.Skip("cs2cs not on PATH")
-	}
+	_ = requireTool(t, "cs2cs")
 	cases := []struct {
 		name     string
 		lat, lon float64

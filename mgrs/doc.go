@@ -14,6 +14,7 @@
 // conscious callers. DecodeParts returns structured zone, band, square,
 // precision, metres, and lat/lon. FormatSpaced pretty-prints compact refs.
 //
-// Tests include a checked-in golden corpus, optional PROJ/cs2cs metre checks,
-// optional GeographicLib GeoConvert string checks, fuzzing, and property tests.
+// Tests include a checked-in golden corpus plus optional external oracles.
+// Set MGRS_REQUIRE_ORACLES=1 to fail (instead of skip) when PROJ or
+// GeographicLib GeoConvert are missing. CI installs those tools and requires them.
 package mgrs

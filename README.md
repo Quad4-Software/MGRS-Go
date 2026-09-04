@@ -103,13 +103,23 @@ go run ./example -bench 500000 -lat 52.658 -lon 5.892
 
 ## Verification
 
-Checked-in goldens in `mgrs/testdata/golden_mgrs.jsonl` assert exact MGRS strings (GeographicLib doc vectors, Blue Marble catalog, Norway/Svalbard, UPS samples).
+CI installs proven external tools and **requires** them (`MGRS_REQUIRE_ORACLES=1`):
 
-When available on `PATH`:
+| Oracle | What it checks |
+|--------|----------------|
+| Checked-in goldens (`mgrs/testdata/golden_mgrs.jsonl`) | Exact MGRS strings from GeographicLib docs, Blue Marble, Norway/Svalbard, UPS |
+| PROJ `proj` | UTM easting/northing within 0.5 m |
+| PROJ `cs2cs` | UPS stereographic metres within 1 m |
+| GeographicLib `GeoConvert` | Exact MGRS encode strings and centre-cell decode lat/lon |
 
-- PROJ `proj` compares UTM easting/northing within 0.5 m
-- PROJ `cs2cs` compares UPS stereographic metres within 1 m
-- GeographicLib `GeoConvert` compares exact MGRS strings (optional)
+Locally, those CLI tests skip if the tools are missing unless you export `MGRS_REQUIRE_ORACLES=1`.
+
+```bash
+# Debian/Ubuntu
+sudo apt-get install -y proj-bin geographiclib-tools
+export MGRS_REQUIRE_ORACLES=1
+go test ./mgrs -count=1 -run 'Proj|GeoLib|Golden'
+```
 
 Default-precision encode is about 90–120 ns/op on a fast desktop CPU. Measure with:
 
@@ -125,6 +135,7 @@ go test ./mgrs -bench=. -benchmem
 | Goldens | `go test ./mgrs -run Golden -v` |
 | PROJ metres | `go test ./mgrs -run Proj -v` |
 | GeoConvert | `go test ./mgrs -run GeoLib -v` |
+| Required oracles | `MGRS_REQUIRE_ORACLES=1 go test ./mgrs -run 'Proj|GeoLib|Golden'` |
 | Race detector | `go test ./... -race` |
 | Bounded fuzz | `go test ./mgrs -fuzz=FuzzEncodeDecodeIEEE -fuzztime=5s` |
 | Bench + allocs | `go test ./mgrs -bench=. -benchmem` |

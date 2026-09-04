@@ -1,4 +1,4 @@
-# Fast Go CI: test, race, vet, and short bench smoke.
+# Fast Go CI with PROJ + GeographicLib oracle validation.
 name: CI
 
 on:
@@ -31,11 +31,14 @@ concurrency:
 permissions:
   contents: read
 
+env:
+  MGRS_REQUIRE_ORACLES: "1"
+
 jobs:
   test:
     name: test (go ${{ matrix.go }})
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
@@ -44,6 +47,19 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install PROJ and GeographicLib
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            proj-bin \
+            geographiclib-tools
+          command -v proj
+          command -v cs2cs
+          command -v GeoConvert
+          proj 2>&1 | head -1 || true
+          GeoConvert -h 2>&1 | head -3
 
       - name: Set up Go
         uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
@@ -54,8 +70,11 @@ jobs:
       - name: Vet
         run: go vet ./...
 
-      - name: Test
-        run: go test ./... -count=1
+      - name: Test with external oracles
+        run: go test ./... -count=1 -v
+
+      - name: Oracle subset (PROJ / GeoConvert / goldens)
+        run: go test ./mgrs -count=1 -v -run 'Proj|GeoLib|Golden'
 
       - name: Race
         run: go test ./... -race -count=1
