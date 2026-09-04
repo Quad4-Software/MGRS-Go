@@ -11,9 +11,11 @@ on:
       - main
   workflow_dispatch:
 
+# Do not cancel in-progress runs. A cancelled Scorecard suite marks the
+# commit status rollup as FAILURE even when CI and CodeQL passed.
 concurrency:
   group: scorecard-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 permissions:
   contents: read
