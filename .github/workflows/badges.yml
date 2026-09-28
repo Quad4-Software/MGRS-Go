@@ -65,10 +65,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if git diff --quiet -- badges; then
-            echo "badges unchanged"
-            exit 0
-          fi
           WORK="$(pwd)"
           PUB="$(mktemp -d)"
           cp -a badges/. "$PUB/"
@@ -77,8 +73,14 @@ jobs:
           git checkout -q -b badges
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git add .
+          if git fetch -q --depth=1 origin badges && \
+             [ "$(git write-tree)" = "$(git rev-parse -q --verify FETCH_HEAD^{tree})" ]; then
+            echo "badges branch already up to date"
+            exit 0
+          fi
           git commit -qm "chore: refresh dynamic shields badges"
-          git push --force "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:badges"
+          git push --force origin HEAD:badges
           cd "$WORK"
           rm -rf "$PUB"
