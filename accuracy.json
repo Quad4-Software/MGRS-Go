@@ -1,0 +1,8 @@
+{
+  "label": "accuracy",
+  "message": "0.5m UTM, 1m UPS",
+  "schemaVersion": 1,
+  "labelColor": "0a0a0b",
+  "color": "8ad0c6",
+  "style": "flat-square"
+}

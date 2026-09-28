@@ -1,0 +1,11 @@
+{
+  "name": "MGRS-Go",
+  "repo": "Quad4-Software/MGRS-Go",
+  "branch": "main",
+  "license": "0BSD",
+  "accuracy": "0.5m UTM, 1m UPS",
+  "references": "PROJ + GeoConvert",
+  "labelColor": "0a0a0b",
+  "color": "8ad0c6",
+  "style": "flat-square"
+}
