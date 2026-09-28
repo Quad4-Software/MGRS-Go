@@ -38,8 +38,8 @@ jobs:
     timeout-minutes: 30
     permissions:
       contents: read
-      security-events: write
-      actions: read
+      security-events: write # upload SARIF results to the code scanning tab
+      actions: read # required by CodeQL when analyzing GitHub Actions
     strategy:
       fail-fast: false
       matrix:
