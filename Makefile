@@ -11,7 +11,7 @@ STATICCHECK_VERSION ?= v0.8.1
 GOFUMPT_VERSION ?= v0.11.0
 GOIMPORTS_VERSION ?= v0.49.0
 
-.PHONY: help tools fmt vet lint staticcheck test test-race accuracy bench fuzz ci clean
+.PHONY: help tools fmt vet lint staticcheck test test-race accuracy badges bench fuzz ci clean
 
 help:
 	@printf '%s\n' \
@@ -24,6 +24,7 @@ help:
 		'  test          Run go test ./...' \
 		'  test-race     Run tests with the race detector' \
 		'  accuracy      Accuracy checks (goldens, PROJ, GeoConvert)' \
+		'  badges        Regenerate shields endpoint badge JSON' \
 		'  bench         Bench smoke for EncodeTo' \
 		'  fuzz          Short bounded fuzz' \
 		'  ci            Local stand-in for CI checks' \
@@ -64,6 +65,9 @@ test-race:
 
 accuracy:
 	$(GO) test ./mgrs -count=1 -run 'Proj|GeoLib|Golden'
+
+badges:
+	bash scripts/gen-badges.sh
 
 bench:
 	$(GO) test ./mgrs -bench=BenchmarkEncodeTo_preallocated -benchmem -count=1 -benchtime=100ms
