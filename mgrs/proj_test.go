@@ -36,7 +36,7 @@ func runProjUTM(t *testing.T, projPath string, lon, lat float64, zone int, south
 	return east, north
 }
 
-func TestProjForwardUTMmatchesLibrary(t *testing.T) {
+func TestProjForwardUTMMatchesLibrary(t *testing.T) {
 	projPath := requireTool(t, "proj")
 	cases := []struct {
 		name     string

@@ -1,6 +1,6 @@
 # MGRS-Go
 
-WGS84 MGRS encode and decode for the full globe: UTM in `[-80°, 84°)` and polar UPS outside that belt.
+WGS84 MGRS encode and decode for the full globe: UTM between 80S and 84N latitude and polar UPS outside that belt.
 
 Grid-zone lettering, Norway/Svalbard zone widening, UPS bands `A/B/Y/Z`, and upper-bound ~nanometre nudges follow GeographicLib / MSP GEOTRANS practice.
 
@@ -71,7 +71,7 @@ g2 := mgrs.Grid{Zone: 38, North: true, Easting: 444000, Northing: 3688000}
 ref2, err := mgrs.EncodeGrid(g2, 2) // 38SMB4488
 ```
 
-`LongitudeZone` remains UTM-only (zones 1–60). Use `LatLonToGrid` for polar points (`ZoneUPS`).
+`LongitudeZone` remains UTM-only (zones 1-60). Use `LatLonToGrid` for polar points (`ZoneUPS`).
 
 ### Allocation-conscious encode
 
@@ -103,25 +103,25 @@ go run ./example -bench 500000 -lat 52.658 -lon 5.892
 
 ## Verification
 
-CI installs proven external tools and **requires** them (`MGRS_REQUIRE_ORACLES=1`):
+Correctness is checked against a checked-in golden corpus and, differentially, against PROJ and GeographicLib:
 
-| Oracle | What it checks |
-|--------|----------------|
-| Checked-in goldens (`mgrs/testdata/golden_mgrs.jsonl`) | Exact MGRS strings from GeographicLib docs, Blue Marble, Norway/Svalbard, UPS |
-| PROJ `proj` | UTM easting/northing within 0.5 m |
-| PROJ `cs2cs` | UPS stereographic metres within 1 m |
-| GeographicLib `GeoConvert` | Exact MGRS encode strings and centre-cell decode lat/lon |
+| Check | What it verifies |
+|-------|------------------|
+| Goldens (`mgrs/testdata/golden_mgrs.jsonl`) | Exact MGRS strings from GeographicLib docs, Blue Marble, Norway/Svalbard, UPS |
+| PROJ `proj` (differential) | UTM easting/northing within 0.5 m |
+| PROJ `cs2cs` (differential) | UPS stereographic metres within 1 m |
+| GeographicLib `GeoConvert` (differential) | Exact MGRS encode strings and centre-cell decode lat/lon |
 
-Locally, those CLI tests skip if the tools are missing unless you export `MGRS_REQUIRE_ORACLES=1`.
+CI installs both tools and requires them (`MGRS_REQUIRE_DIFF=1`). Locally the CLI-dependent tests skip when a tool is missing unless you export that variable.
 
 ```bash
 # Debian/Ubuntu
 sudo apt-get install -y proj-bin geographiclib-tools
-export MGRS_REQUIRE_ORACLES=1
+export MGRS_REQUIRE_DIFF=1
 go test ./mgrs -count=1 -run 'Proj|GeoLib|Golden'
 ```
 
-Default-precision encode is about 90–120 ns/op on a fast desktop CPU. Measure with:
+Default-precision encode is about 90-120 ns/op on a fast desktop CPU. Measure with:
 
 ```bash
 go test ./mgrs -bench=. -benchmem
@@ -135,7 +135,7 @@ go test ./mgrs -bench=. -benchmem
 | Goldens | `go test ./mgrs -run Golden -v` |
 | PROJ metres | `go test ./mgrs -run Proj -v` |
 | GeoConvert | `go test ./mgrs -run GeoLib -v` |
-| Required oracles | `MGRS_REQUIRE_ORACLES=1 go test ./mgrs -run 'Proj|GeoLib|Golden'` |
+| Required differential | `MGRS_REQUIRE_DIFF=1 go test ./mgrs -run 'Proj|GeoLib|Golden'` |
 | Race detector | `go test ./... -race` |
 | Bounded fuzz | `go test ./mgrs -fuzz=FuzzEncodeDecodeIEEE -fuzztime=5s` |
 | Bench + allocs | `go test ./mgrs -bench=. -benchmem` |
@@ -149,7 +149,7 @@ make lint
 make ci      # vet + lint + staticcheck + test
 ```
 
-CI runs `golangci-lint`, `staticcheck`, a format check (`gofumpt` / `goimports`), then the oracle test job.
+CI runs `golangci-lint`, `staticcheck`, a format check (`gofumpt` / `goimports`), then tests with the differential tools installed and required.
 
 ## License
 

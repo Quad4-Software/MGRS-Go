@@ -40,7 +40,7 @@ func runCS2CSUPS(t *testing.T, lon, lat float64, north bool) (e, n float64) {
 	return east, northing
 }
 
-func TestProjForwardUPSmatchesLibrary(t *testing.T) {
+func TestProjForwardUPSMatchesLibrary(t *testing.T) {
 	_ = requireTool(t, "cs2cs")
 	cases := []struct {
 		name     string

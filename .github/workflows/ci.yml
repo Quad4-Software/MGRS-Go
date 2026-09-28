@@ -1,4 +1,4 @@
-# Fast Go CI with PROJ + GeographicLib oracle validation.
+# Go CI with differential checks against PROJ and GeographicLib.
 name: CI
 
 on:
@@ -36,7 +36,7 @@ permissions:
   contents: read
 
 env:
-  MGRS_REQUIRE_ORACLES: "1"
+  MGRS_REQUIRE_DIFF: "1"
   # Pin Go toolchain installs. Avoid @latest in CI after supply-chain tag retargeting attacks.
   STATICCHECK_VERSION: v0.8.1
   GOFUMPT_VERSION: v0.11.0
@@ -127,10 +127,10 @@ jobs:
       - name: Vet
         run: go vet ./...
 
-      - name: Test with external oracles
+      - name: Test
         run: go test ./... -count=1 -v
 
-      - name: Oracle subset (PROJ / GeoConvert / goldens)
+      - name: Accuracy subset (goldens / PROJ / GeoConvert)
         run: go test ./mgrs -count=1 -v -run 'Proj|GeoLib|Golden'
 
       - name: Race

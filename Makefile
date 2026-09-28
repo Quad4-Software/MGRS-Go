@@ -11,7 +11,7 @@ STATICCHECK_VERSION ?= v0.8.1
 GOFUMPT_VERSION ?= v0.11.0
 GOIMPORTS_VERSION ?= v0.49.0
 
-.PHONY: help tools fmt vet lint staticcheck test test-race oracle bench fuzz ci clean
+.PHONY: help tools fmt vet lint staticcheck test test-race accuracy bench fuzz ci clean
 
 help:
 	@printf '%s\n' \
@@ -23,7 +23,7 @@ help:
 		'  staticcheck   Run staticcheck' \
 		'  test          Run go test ./...' \
 		'  test-race     Run tests with the race detector' \
-		'  oracle        Oracle subset (PROJ / GeoConvert / goldens)' \
+		'  accuracy      Accuracy checks (goldens, PROJ, GeoConvert)' \
 		'  bench         Bench smoke for EncodeTo' \
 		'  fuzz          Short bounded fuzz' \
 		'  ci            Local stand-in for CI checks' \
@@ -62,7 +62,7 @@ test:
 test-race:
 	$(GO) test ./... -race -count=1
 
-oracle:
+accuracy:
 	$(GO) test ./mgrs -count=1 -run 'Proj|GeoLib|Golden'
 
 bench:
