@@ -1,3 +1,3 @@
 module github.com/Quad4-Software/MGRS-Go
 
-go 1.26.5
+go 1.27.1

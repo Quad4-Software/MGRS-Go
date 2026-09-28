@@ -10,7 +10,7 @@ Grid-zone lettering, Norway/Svalbard zone widening, UPS bands `A/B/Y/Z`, and upp
 
 ## Requirements
 
-- Go 1.26.5 or later
+- Go 1.27.1 or later
 
 ## Install
 
